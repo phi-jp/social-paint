@@ -1,105 +1,119 @@
+<!doctype html>
+
 <html>
   <head>
-    <script>
-      var host = location.origin.replace(/^http/, 'ws')
-      var ws = new WebSocket(host);
-      var color = (function() {
-        var colors = [
-          'red', 'green', 'blue',
-        ];
-        var i = Math.floor(Math.random()*3);
-        return colors[i];
-      })();
-
-      ws.onopen = function() {
-        console.log('connected');
-      };
-      ws.onmessage = function (e) {
-        var data = JSON.parse(e.data);
-        // drawPoint(data.x, data.y, data.color);
-        drawLine(data.sx, data.sy, data.ex, data.ey, data.color);
-      };
-
-      window.onload = function() {
-        var canvas = document.getElementById("world");
-        var context = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        context.lineCap = 'round';
-        context.lineJoin = 'round';
-        context.lineWidth = 8;
-        canvas.onmousedown = start;
-        canvas.onmousemove = move;
-        canvas.onmouseup = end;
-      };
-
-
-      var sx, sy;
-      var ex, ey;
-      var start = function(e) {
-        sx = e.clientX;
-        sy = e.clientY;
-      };
-
-      var move = function(e) {
-        if (!sx || !sy) { return }
-        ex = e.clientX;
-        ey = e.clientY;
-        send(sx, sy, ex, ey);
-
-        sx = ex;
-        sy = ey;
-      };
-
-      var end = function() {
-        sx = null;
-        sy = null;
-      };
-
-      var send = function(x, y, ex, ey) {
-        var data = {
-          x: x,
-          y: y,
-          sx: x,
-          sy: y,
-          ex: ex,
-          ey: ey,
-          color: color,
-        };
-        var str = JSON.stringify(data);
-
-        ws.send(str);
-      };
-
-      var drawPoint = function(x, y, color) {
-        var canvas = document.getElementById("world");
-        var context = canvas.getContext('2d');
-        context.fillStyle = color;
-        context.fillRect(x, y, 5, 5);
-      };
-
-      var drawLine = function(sx, sy, ex, ey, color) {
-        var canvas = document.getElementById("world");
-        var context = canvas.getContext('2d');
-
-        context.beginPath();
-        context.moveTo(sx, sy);
-        context.lineTo(ex, ey);
-        context.strokeStyle = color;
-        context.stroke();
-      };
-
-    </script>
-    <style>
-    #world {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-    }
-    </style>
+    <meta charset='utf-8' />
   </head>
   <body>
     <canvas id='world'></canvas>
   </body>
 </html>
+
+<style>
+#world {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+</style>
+
+<script>
+var host = location.origin.replace(/^http/, 'ws')
+var ws = new WebSocket(host);
+var color = (function() {
+  var colors = [
+    'red', 'green', 'blue',
+  ];
+  var i = Math.floor(Math.random()*3);
+  return colors[i];
+})();
+var sx, sy;
+var ex, ey;
+
+
+/*
+ *
+ */
+var start = function(e) {
+  sx = e.clientX;
+  sy = e.clientY;
+};
+
+var move = function(e) {
+  if (!sx || !sy) { return }
+  ex = e.clientX;
+  ey = e.clientY;
+  send(sx, sy, ex, ey);
+
+  sx = ex;
+  sy = ey;
+};
+
+var end = function() {
+  sx = null;
+  sy = null;
+};
+
+var send = function(x, y, ex, ey) {
+  var data = {
+    x: x,
+    y: y,
+    sx: x,
+    sy: y,
+    ex: ex,
+    ey: ey,
+    color: color,
+  };
+  var str = JSON.stringify(data);
+
+  ws.send(str);
+};
+
+var drawPoint = function(x, y, color) {
+  var canvas = document.getElementById("world");
+  var context = canvas.getContext('2d');
+  context.fillStyle = color;
+  context.fillRect(x, y, 5, 5);
+};
+
+var drawLine = function(sx, sy, ex, ey, color) {
+  var canvas = document.getElementById("world");
+  var context = canvas.getContext('2d');
+
+  context.beginPath();
+  context.moveTo(sx, sy);
+  context.lineTo(ex, ey);
+  context.strokeStyle = color;
+  context.stroke();
+};
+
+/*
+ *
+ */
+ws.onopen = function() {
+  console.log('connected');
+};
+ws.onmessage = function (e) {
+  var data = JSON.parse(e.data);
+  // drawPoint(data.x, data.y, data.color);
+  drawLine(data.sx, data.sy, data.ex, data.ey, data.color);
+};
+
+/*
+ *
+ */
+window.onload = function() {
+  var canvas = document.getElementById("world");
+  var context = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+  context.lineWidth = 8;
+  canvas.onmousedown = start;
+  canvas.onmousemove = move;
+  canvas.onmouseup = end;
+};
+
+</script>
